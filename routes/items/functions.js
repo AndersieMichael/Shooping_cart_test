@@ -4,7 +4,7 @@
  * @param {*} pg_client pool connection 
  * @returns 
  */
- async function getAllItems(pg_client){
+ async function getAllItems(pg_client,current_page,limit){
     let query
     let success
     let result
@@ -13,8 +13,22 @@
         query= `select name,stock
                 from item i join item_catalogue ic 
                 on i.item_id  = ic.item_id 
-                order by i.item_id`
+                `
+        // APPLY ORDER BY
+        query += `  order by i.item_id `;
 
+
+        // LIMIT 
+        if(limit){
+            query += ` LIMIT ${limit} `;
+        }
+        
+
+        // OFFSET 
+        let offset = limit * Math.max(((current_page || 0) - 1), 0);
+        query += ` OFFSET ${offset} `;
+        
+        //EXECUTE QUERY
         const temp = await pg_client.query(query)
         if(temp==null || temp==undefined){
             throw new Error(`query Resulted on: ${temp}`)
@@ -217,6 +231,35 @@ async function deleteItem(pg_client,id){
     return[success,result]
 }
 
+/**
+ * This function will count total item
+ * 
+ * @param {*} pg_client pool connection 
+ * @returns 
+ */
+ async function CountAllItem(pg_client){
+    let query
+    let success
+    let result
+
+    try {
+        query= `select count(item_id)as count
+                from item `
+        const temp = await pg_client.query(query)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
 
 //EXPORTS
 
@@ -226,3 +269,4 @@ exports.checkingItemNameExist = checkingItemNameExist
 exports.addItem = addItem
 exports.updateItem = updateItem
 exports.deleteItem = deleteItem
+exports.CountAllItem = CountAllItem

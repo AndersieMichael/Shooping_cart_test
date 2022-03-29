@@ -1,19 +1,36 @@
 
+
+
 /**
  * This function will get all customer data from database
  * 
  * @param {*} pg_client pool connection 
  * @returns 
  */
- async function getAllCustomer(pg_client){
+ async function getAllCustomer(pg_client,current_page,limit){
     let query
     let success
     let result
 
     try {
         query= `select customer_id,name,username,password,phone_number
-                from customer
-                order by customer_id`
+                from customer`
+
+        // APPLY ORDER BY
+        query += `  order by customer_id asc `;
+
+
+        // LIMIT 
+        if(limit){
+            query += ` LIMIT ${limit} `;
+        }
+        
+
+        // OFFSET 
+        let offset = limit * Math.max(((current_page || 0) - 1), 0);
+        query += ` OFFSET ${offset} `;
+        
+        //EXECUTE QUERY
         const temp = await pg_client.query(query)
         if(temp==null || temp==undefined){
             throw new Error(`query Resulted on: ${temp}`)
@@ -224,6 +241,36 @@ async function updateCustomer(pg_client,id,name,phone,username,password){
 }
 
 
+/**
+ * This function will get count total customer
+ * 
+ * @param {*} pg_client pool connection 
+ * @returns 
+ */
+async function CountAllCustomer(pg_client){
+    let query
+    let success
+    let result
+
+    try {
+        query= `select count(customer_id)as count
+                from customer `
+        const temp = await pg_client.query(query)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
+
 //EXPORTS
 
 exports.getAllCustomer = getAllCustomer
@@ -232,3 +279,4 @@ exports.addCustomer = addCustomer
 exports.updateCustomer = updateCustomer
 exports.checkingUsername = checkingUsernameExist
 exports.deleteCustomer = deleteCustomer
+exports.CountAllCustomer = CountAllCustomer

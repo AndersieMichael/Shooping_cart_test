@@ -4,7 +4,7 @@
  * @param {*} pg_client pool connection 
  * @returns 
  */
- async function getAllCart(pg_client){
+ async function getAllCart(pg_client,current_page,limit){
     let query
     let success
     let result
@@ -12,8 +12,23 @@
     try {
         query= `select *
                 from shooping_cart
-                order by cart_id`
+               `
 
+        // APPLY ORDER BY
+        query += `   order by cart_id `;
+
+
+        // LIMIT 
+        if(limit){
+            query += ` LIMIT ${limit} `;
+        }
+        
+
+        // OFFSET 
+        let offset = limit * Math.max(((current_page || 0) - 1), 0);
+        query += ` OFFSET ${offset} `;
+        
+        //EXECUTE QUERY
         const temp = await pg_client.query(query)
         if(temp==null || temp==undefined){
             throw new Error(`query Resulted on: ${temp}`)
@@ -46,10 +61,64 @@ async function getCartByCustomerId(pg_client,id){
     try {
         query= `select * from shooping_cart sc natural join 
                 cart_detail cd 
+                where customer_id =$1
+                order by cart_detail_id `
+        value=[
+            id
+        ]
+    
+         //EXECUTE QUERY
+        const temp = await pg_client.query(query,value)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
+/**
+ * This function will get Cart by customer id PAGINATION
+ * 
+ * @param {*} pg_client pool connection 
+ * @param {number} id customer_ID
+ * @returns 
+ */
+
+ async function getCartByCustomerIdPagination(pg_client,id,current_page,limit){
+    let query
+    let value
+    let success
+    let result
+
+    try {
+        query= `select * from shooping_cart sc natural join 
+                cart_detail cd 
                 where customer_id =$1`
         value=[
             id
         ]
+         // APPLY ORDER BY
+         query += `   order by cart_detail_id `;
+
+
+         // LIMIT 
+         if(limit){
+             query += ` LIMIT ${limit} `;
+         }
+         
+ 
+         // OFFSET 
+         let offset = limit * Math.max(((current_page || 0) - 1), 0);
+         query += ` OFFSET ${offset} `;
+         
+         //EXECUTE QUERY
         const temp = await pg_client.query(query,value)
         if(temp==null || temp==undefined){
             throw new Error(`query Resulted on: ${temp}`)
@@ -293,6 +362,70 @@ async function addCart_detail(pg_client,cart_id,item_id,stock){
     return[success,result]
 }
 
+/**
+ * This function will count total Cart
+ * 
+ * @param {*} pg_client pool connection 
+ * @returns 
+ */
+ async function CountAllCart(pg_client){
+    let query
+    let success
+    let result
+
+    try {
+        query= `select count(cart_id)as count
+                from shooping_cart `
+        const temp = await pg_client.query(query)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
+/**
+ * This function will count total Cart
+ * 
+ * @param {*} pg_client pool connection 
+ * @param {number} id customer id
+ * @returns 
+ */
+ async function CountAllCartbyID(pg_client,id){
+    let query
+    let success
+    let result
+
+    try {
+        query= `select count(cart_detail_id)as count
+                from shooping_cart sc natural join 
+                cart_detail cd 
+                where customer_id =$1`
+        value=[
+            id
+        ]
+        const temp = await pg_client.query(query,value)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
 exports.getAllCart = getAllCart
 exports.getCartByCustomerId = getCartByCustomerId
 exports.getCartById = getCartById
@@ -301,3 +434,6 @@ exports.addCart_header = addCart_header
 exports.addCart_detail = addCart_detail
 exports.deleteCart = deleteCart
 exports.updateCart = updateCart
+exports.CountAllCart = CountAllCart
+exports.CountAllCartbyID = CountAllCartbyID
+exports.getCartByCustomerIdPagination = getCartByCustomerIdPagination

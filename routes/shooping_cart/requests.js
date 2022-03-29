@@ -18,6 +18,9 @@ const addCart_header = require('./functions').addCart_header
 const addCart_detail = require('./functions').addCart_detail
 const deleteCart = require('./functions').deleteCart
 const updateCart = require('./functions').updateCart
+const CountAllCart = require('./functions').CountAllCart
+const CountAllCartbyID = require('./functions').CountAllCartbyID
+const getCartByCustomerIdPagination = require('./functions').getCartByCustomerIdPagination
 
 const checkingStock = require('../Item_Catalogue/functions').checkingStock
 
@@ -27,6 +30,10 @@ const customerById = require('../customer/functions').customerById
 //middleware
 
 const middleware = require('../../middleware/middleware').customerMiddlware
+
+
+//PAGINATION
+const PaginatePagesSimple = require('../../paginate').PaginatePagesSimple;
 
 //conection to database
 
@@ -44,13 +51,48 @@ router.get('/view' , async(req , res)=>{
     let request_namepath = req.path
     let time_requested = moment(Date.now())
 
+    //JOI QUERY VALIDATION
+
+    let joi_template_query = joi.object({
+        "Page": joi.number().min(1).required(),
+        "Limit": joi.number().required(),
+    }).required();
+
+    const url_query = req.query;
+
+    let joi_validation_query = joi_template_query.validate(url_query);
+    if(joi_validation_query.error){
+        const message = {
+            "message": "Failed",
+            "error_key": "error_query",
+            "error_message": joi_validation_query.error.stack,
+            "error_data": joi_validation_query.error.details
+        };
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+        res.status(200).json(message);
+        return; //END
+
+    }
+
+    //PARAM
+    let current_page = joi_validation_query.value["Page"];
+    let limit = joi_validation_query.value["Limit"];
+
+
     const pg_client = await pool.connect()
 
-    // get all item
+    // get all Cart
 
-    let[success,result] = await getAllCart(pg_client)
+    let[success,result] = await getAllCart(pg_client,current_page,limit)
 
-    //ERROR GET ALL ITEM
+    //ERROR GET ALL Cart
 
     if(!success){
         
@@ -77,11 +119,51 @@ router.get('/view' , async(req , res)=>{
         res.status(200).json(message)
         return;
     }
+    
+    //COUNT ALL TOTAL Cart
+
+    let[tsuccess,tresult] = await CountAllCart(pg_client)
+    
+    //ERROR COUNT ALL TOTAL Cart
+    
+    if(!tsuccess){
+
+        console.error(tresult);
+        pg_client.release();
+        
+        //Error Message
+        const message = {
+            "message": "Failed",
+            "error_key": "error_internal_server",
+            "error_message": tresult,
+            "error_data": "ON calculate Total Cart"
+        };
+        
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+
+        //SUCCESS
+
+        res.status(200).json(message)
+        return;
+    }    
+    
+    let total = tresult[0]["count"]
+
+    //change to paginate template
+
+    let final = PaginatePagesSimple(result,current_page,limit,total)
 
     //success
 
     pg_client.release();
-    res.status(200).json({"message":"Success","data":result})
+    res.status(200).json({"message":"Success","data":final})
     return;
 
 })
@@ -413,13 +495,47 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
     let request_namepath = req.path
     let time_requested = moment(Date.now())
 
+    //JOI QUERY VALIDATION
+
+    let joi_template_query = joi.object({
+        "Page": joi.number().min(1).required(),
+        "Limit": joi.number().required(),
+    }).required();
+
+    const url_query = req.query;
+
+    let joi_validation_query = joi_template_query.validate(url_query);
+    if(joi_validation_query.error){
+        const message = {
+            "message": "Failed",
+            "error_key": "error_query",
+            "error_message": joi_validation_query.error.stack,
+            "error_data": joi_validation_query.error.details
+        };
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+        res.status(200).json(message);
+        return; //END
+
+    }
+
+    //PARAM
+    let current_page = joi_validation_query.value["Page"];
+    let limit = joi_validation_query.value["Limit"];
+
     let cust_id = res.locals.curr_customer_id;
 
     const pg_client = await pool.connect()
 
     // checking cart id
 
-    let[success,result] = await getCartByCustomerId(pg_client,cust_id)
+    let[success,result] = await getCartByCustomerIdPagination(pg_client,cust_id,current_page,limit)
     
     //Error checking cart id
 
@@ -449,10 +565,78 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
         return;
     }
 
+    //data not found / kosong
+
+    if(result.length === 0){ 
+        
+        //Error
+        
+        console.error(result);
+        const message = {
+            "message": "Failed",
+            "error_key": "error_data_not_found",
+            "error_message": "Cant found order data",
+            "error_data": {
+                "ON": "viewOrderMiddleware"
+            }
+        };
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+        pg_client.release();
+        res.status(200).json(message);
+        return; //END
+    }
+
+    //COUNT ALL TOTAL Cart
+
+    let[tsuccess,tresult] = await CountAllCartbyID(pg_client,cust_id)
+    
+    //ERROR COUNT ALL TOTAL Cart
+    
+    if(!tsuccess){
+
+        console.error(tresult);
+        pg_client.release();
+        
+        //Error Message
+        const message = {
+            "message": "Failed",
+            "error_key": "error_internal_server",
+            "error_message": tresult,
+            "error_data": "ON calculate Total Cart middleware"
+        };
+        
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+
+        //SUCCESS
+
+        res.status(200).json(message)
+        return;
+    }    
+    
+    let total = tresult[0]["count"]
+
+    //change to paginate template
+
+    let final = PaginatePagesSimple(result,current_page,limit,total)
+
     //success
 
     pg_client.release();
-    res.status(200).json({"message":"Success","data":result})
+    res.status(200).json({"message":"Success","data":final})
     return;
 
 })

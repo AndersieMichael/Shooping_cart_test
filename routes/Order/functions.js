@@ -4,7 +4,7 @@
  * @param {*} pg_client pool connection 
  * @returns 
  */
-async function getAllOrder_Header(pg_client){
+async function getAllOrder_Header(pg_client,current_page,limit){
     let query
     let success
     let result
@@ -12,8 +12,23 @@ async function getAllOrder_Header(pg_client){
     try {
         query= `select *
                 from order_header
-                order by order_header_id`
+                `
 
+        // APPLY ORDER BY
+        query += `  order by order_header_id `;
+
+
+        // LIMIT 
+        if(limit){
+            query += ` LIMIT ${limit} `;
+        }
+        
+
+        // OFFSET 
+        let offset = limit * Math.max(((current_page || 0) - 1), 0);
+        query += ` OFFSET ${offset} `;
+        
+        //EXECUTE QUERY
         const temp = await pg_client.query(query)
         if(temp==null || temp==undefined){
             throw new Error(`query Resulted on: ${temp}`)
@@ -257,6 +272,35 @@ async function updateStatus(pg_client,header_id){
     return[success,result]
 }
 
+/**
+ * This function will count total Order_Header
+ * 
+ * @param {*} pg_client pool connection 
+ * @returns 
+ */
+ async function CountAllOrderHeader(pg_client){
+    let query
+    let success
+    let result
+
+    try {
+        query= `select count(order_header_id)as count
+                from order_header `
+        const temp = await pg_client.query(query)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
 //EXPORTS
 
 exports.getAllOrder_Header = getAllOrder_Header
@@ -266,3 +310,4 @@ exports.addOrder_Detail = addOrder_Detail
 exports.getRangeStock = getRangeStock
 exports.updateStatus = updateStatus
 exports.getOrder_HeaderByID = getOrder_HeaderByID
+exports.CountAllOrderHeader = CountAllOrderHeader
