@@ -17,7 +17,10 @@ const addOrderDetail = require('./functions').addOrder_Detail;
 const calculateStock = require('./functions').getRangeStock;
 const updateStatus = require('./functions').updateStatus;
 const viewOrderHeaderByID = require('./functions').getOrder_HeaderByID;
-const CountAllOrder = require('./functions').CountAllOrderHeader
+const CountAllOrder = require('./functions').CountAllOrderHeader;
+const CountAllOrderByID = require('./functions').CountAllOrderByCustomer;
+const getOrderByCustomerIdPagination = require('./functions').getOrderByCustomerIdPagination;
+
 
 const getCartByCustomerId = require('../shooping_cart/functions').getCartByCustomerId
 
@@ -604,6 +607,161 @@ router.get('/status' , async(req , res)=>{
 
     pg_client.release();
     res.status(200).json({"message":"Success","data":result})
+    return;
+
+})
+
+// //view Order by middleware
+//===============================================================================================
+router.get('/viewMiddleware' ,middleware, async(req , res)=>{
+       
+    //Basic Info
+    
+    let request_namepath = req.path
+    let time_requested = moment(Date.now())
+
+    //JOI QUERY VALIDATION
+
+    let joi_template_query = joi.object({
+        "Page": joi.number().min(1).required(),
+        "Limit": joi.number().required(),
+    }).required();
+
+    const url_query = req.query;
+
+    let joi_validation_query = joi_template_query.validate(url_query);
+    if(joi_validation_query.error){
+        const message = {
+            "message": "Failed",
+            "error_key": "error_query",
+            "error_message": joi_validation_query.error.stack,
+            "error_data": joi_validation_query.error.details
+        };
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+        res.status(200).json(message);
+        return; //END
+
+    }
+
+    //PARAM
+    let current_page = joi_validation_query.value["Page"];
+    let limit = joi_validation_query.value["Limit"];
+
+    let cust_id = res.locals.curr_customer_id;
+
+    const pg_client = await pool.connect()
+
+    // get Order id
+
+    let[success,result] = await getOrderByCustomerIdPagination(pg_client,cust_id,current_page,limit)
+    
+    //Error get Order id
+
+    if(!success){
+        
+        console.error(result);
+        pg_client.release();
+        
+        //Error Message
+        const message = {
+            "message": "Failed",
+            "error_key": "error_internal_server",
+            "error_message": result,
+            "error_data": "ON getOrderID"
+        };
+        
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+
+        res.status(200).json(message)
+        return;
+    }
+
+    //data not found / kosong
+
+    if(result.length === 0){ 
+        
+        //Error
+        
+        console.error(result);
+        const message = {
+            "message": "Failed",
+            "error_key": "error_data_not_found",
+            "error_message": "Cant found order data",
+            "error_data": {
+                "ON": "viewOrderMiddleware"
+            }
+        };
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+        pg_client.release();
+        res.status(200).json(message);
+        return; //END
+    }
+
+    //COUNT ALL TOTAL Order
+
+    let[tsuccess,tresult] = await CountAllOrderByID(pg_client,cust_id)
+    
+    //ERROR COUNT ALL TOTAL Order
+    
+    if(!tsuccess){
+
+        console.error(tresult);
+        pg_client.release();
+        
+        //Error Message
+        const message = {
+            "message": "Failed",
+            "error_key": "error_internal_server",
+            "error_message": tresult,
+            "error_data": "ON calculate Total Order middleware"
+        };
+        
+        //LOGGING
+        logApiBasic( 
+            `Request ${head_route_name}${request_namepath} Failed`,
+            `REQUEST GOT AT : ${time_requested} \n` +
+            "REQUEST BODY/PARAM : \n" +
+            JSON.stringify('', null, 2),
+            JSON.stringify(message, null, 2)
+        );
+
+        //SUCCESS
+
+        res.status(200).json(message)
+        return;
+    }    
+    
+    let total = tresult[0]["count"]
+
+    //change to paginate template
+
+    let final = PaginatePagesSimple(result,current_page,limit,total)
+
+    //success
+
+    pg_client.release();
+    res.status(200).json({"message":"Success","data":final})
     return;
 
 })

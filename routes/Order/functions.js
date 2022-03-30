@@ -45,7 +45,7 @@ async function getAllOrder_Header(pg_client,current_page,limit){
 }
 
 /**
- * This function will get Order_HEADER data BY ORDER_HEADEr ID
+ * This function will get Order_HEADER data BY ORDER_HEADER ID
  * 
  * @param {*} pg_client pool connection 
  * @param {number} order_header_id orderHeader ID
@@ -63,6 +63,57 @@ async function getOrder_HeaderByID(pg_client,order_header_id){
         value=[
             order_header_id
         ]
+        const temp = await pg_client.query(query,value)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
+/**
+ * This function will get Order by customer id PAGINATION
+ * 
+ * @param {*} pg_client pool connection 
+ * @param {number} id customer_ID
+ * @returns 
+ */
+
+async function getOrderByCustomerIdPagination(pg_client,id,current_page,limit){
+    let query
+    let value
+    let success
+    let result
+
+    try {
+        query= `select * from order_header oh natural join 
+                order_detail od  
+                where customer_id =$1`
+        value=[
+            id
+        ]
+         // APPLY ORDER BY
+         query += `   order by order_detail_id `;
+
+
+         // LIMIT 
+         if(limit){
+             query += ` LIMIT ${limit} `;
+         }
+         
+ 
+         // OFFSET 
+         let offset = limit * Math.max(((current_page || 0) - 1), 0);
+         query += ` OFFSET ${offset} `;
+         
+         //EXECUTE QUERY
         const temp = await pg_client.query(query,value)
         if(temp==null || temp==undefined){
             throw new Error(`query Resulted on: ${temp}`)
@@ -301,6 +352,40 @@ async function updateStatus(pg_client,header_id){
     return[success,result]
 }
 
+/**
+ * This function will count total Order by customer id
+ * 
+ * @param {*} pg_client pool connection 
+ * @returns 
+ */
+async function CountAllOrderByCustomer(pg_client,id){
+    let query
+    let success
+    let result
+
+    try {
+        query= `select count(order_detail_id)as count
+                from order_header oh natural join 
+                order_detail od  
+                where customer_id =$1`
+        value=[
+            id
+        ]        
+        const temp = await pg_client.query(query,value)
+        if(temp==null || temp==undefined){
+            throw new Error(`query Resulted on: ${temp}`)
+        }else{
+            result= temp.rows
+            success = true
+        }
+    } catch (error) {
+        console.log(error.message);
+        success=false;
+        result=error.message;
+    }
+    return[success,result]
+}
+
 //EXPORTS
 
 exports.getAllOrder_Header = getAllOrder_Header
@@ -311,3 +396,5 @@ exports.getRangeStock = getRangeStock
 exports.updateStatus = updateStatus
 exports.getOrder_HeaderByID = getOrder_HeaderByID
 exports.CountAllOrderHeader = CountAllOrderHeader
+exports.CountAllOrderByCustomer = CountAllOrderByCustomer
+exports.getOrderByCustomerIdPagination = getOrderByCustomerIdPagination
