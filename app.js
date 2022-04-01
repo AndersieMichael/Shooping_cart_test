@@ -9,7 +9,7 @@ const app = express()
 const Customer = require('./routes/customer/requests');
 const Items = require('./routes/items/requests');
 
-const cart = require('./routes/shooping_cart/requests');
+const cart = require('./routes/shopping_cart/requests');
 
 const order = require('./routes/Order/requests');
 
@@ -20,7 +20,7 @@ const port = 8080;
 app.use(express.json());
 
 app.get('/',(req,res)=>{
-    res.send("WELCOME TO RIKO'S MART");
+    res.send("WELCOME TO Beta'S MART");
 })
 
 //ROUTES IMPLEMENT

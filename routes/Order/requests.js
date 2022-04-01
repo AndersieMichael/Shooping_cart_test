@@ -4,10 +4,6 @@ const router = express.Router()
 const joi = require('joi')
 const moment = require("moment")
 
-//logging
-
-const logApiBasic = require('../../utilities/slack').logApiBasic;
-
 //FUNCTION
 
 const viewAllOrder_Header = require('./functions').getAllOrder_Header;
@@ -22,10 +18,14 @@ const CountAllOrderByID = require('./functions').CountAllOrderByCustomer;
 const getOrderByCustomerIdPagination = require('./functions').getOrderByCustomerIdPagination;
 
 
-const getCartByCustomerId = require('../shooping_cart/functions').getCartByCustomerId
+const getCartByCustomerId = require('../shopping_cart/functions').getCartByCustomerId
 
 const checkingStock = require('../Item_Catalogue/functions').checkingStock
 const updateItemCatalogueByItemID = require('../Item_Catalogue/functions').updateItemCatalogueByItemID
+
+//logging
+
+// const logApiBasic = require('../../utilities/slack').logApiBasic;
 
 //middleware
 
@@ -33,6 +33,7 @@ const middleware = require('../../middleware/middleware').customerMiddlware
 
 
 //PAGINATION
+
 const PaginatePagesSimple = require('../../paginate').PaginatePagesSimple;
 
 
@@ -42,7 +43,7 @@ const pool = require('../../utilities/connection').pool
 
 let head_route_name = "/Order_Header"
 
-//view all Order_Header
+//view all Order_Header USING PAGINATION
 //===============================================================================================
 router.get('/view' , async(req , res)=>{
        
@@ -69,13 +70,13 @@ router.get('/view' , async(req , res)=>{
             "error_data": joi_validation_query.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -107,13 +108,13 @@ router.get('/view' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -138,13 +139,13 @@ router.get('/view' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         //SUCCESS
 
@@ -238,13 +239,13 @@ router.post('/add',middleware, async(req,res)=>{
                     "error_data": "ON Checking Stock"
                 };
                 //LOGGING
-                logApiBasic( 
-                    `Request ${head_route_name}${request_namepath} Failed`,
-                    `REQUEST GOT AT : ${time_requested} \n` +
-                    "REQUEST BODY/PARAM : \n" +
-                    JSON.stringify('', null, 2),
-                    JSON.stringify(message, null, 2)
-                );
+                // logApiBasic( 
+                //     `Request ${head_route_name}${request_namepath} Failed`,
+                //     `REQUEST GOT AT : ${time_requested} \n` +
+                //     "REQUEST BODY/PARAM : \n" +
+                //     JSON.stringify('', null, 2),
+                //     JSON.stringify(message, null, 2)
+                // );
             
                 res.status(200).json(message)
                 return;
@@ -264,13 +265,13 @@ router.post('/add',middleware, async(req,res)=>{
                     "error_data": "ON stock to low"
                 };
                 //LOGGING
-                logApiBasic( 
-                    `Request ${head_route_name}${request_namepath} Failed`,
-                    `REQUEST GOT AT : ${time_requested} \n` +
-                    "REQUEST BODY/PARAM : \n" +
-                    JSON.stringify('', null, 2),
-                    JSON.stringify(message, null, 2)
-                );
+                // logApiBasic( 
+                //     `Request ${head_route_name}${request_namepath} Failed`,
+                //     `REQUEST GOT AT : ${time_requested} \n` +
+                //     "REQUEST BODY/PARAM : \n" +
+                //     JSON.stringify('', null, 2),
+                //     JSON.stringify(message, null, 2)
+                // );
             
                 res.status(200).json(message)
                 return;
@@ -339,13 +340,13 @@ router.post('/add',middleware, async(req,res)=>{
                 };
                 
                 //LOGGING
-                logApiBasic( 
-                    `Request ${head_route_name}${request_namepath} Failed`,
-                    `REQUEST GOT AT : ${time_requested} \n` +
-                    "REQUEST BODY/PARAM : \n" +
-                    JSON.stringify('', null, 2),
-                    JSON.stringify(message, null, 2)
-                );
+                // logApiBasic( 
+                //     `Request ${head_route_name}${request_namepath} Failed`,
+                //     `REQUEST GOT AT : ${time_requested} \n` +
+                //     "REQUEST BODY/PARAM : \n" +
+                //     JSON.stringify('', null, 2),
+                //     JSON.stringify(message, null, 2)
+                // );
         
                 res.status(200).json(message)
                 return;
@@ -373,13 +374,13 @@ router.post('/add',middleware, async(req,res)=>{
             "error_data": "ON calculateCart"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -408,13 +409,13 @@ router.post('/add',middleware, async(req,res)=>{
             "error_data": "ON add Order Header"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -442,13 +443,13 @@ router.post('/add',middleware, async(req,res)=>{
             "error_data": "ON add Order Detail"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -490,13 +491,13 @@ router.get('/status' , async(req , res)=>{
             "error_data": joi_body_validation.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -528,13 +529,13 @@ router.get('/status' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -557,13 +558,13 @@ router.get('/status' , async(req , res)=>{
             }
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         pg_client.release();
         res.status(200).json(message);
         return; //END
@@ -591,13 +592,13 @@ router.get('/status' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -611,7 +612,7 @@ router.get('/status' , async(req , res)=>{
 
 })
 
-// //view Order by middleware
+// //view Order by middleware USING PAGINATION
 //===============================================================================================
 router.get('/viewMiddleware' ,middleware, async(req , res)=>{
        
@@ -638,13 +639,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
             "error_data": joi_validation_query.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -678,13 +679,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -706,13 +707,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
             }
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         pg_client.release();
         res.status(200).json(message);
         return; //END
@@ -738,13 +739,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         //SUCCESS
 

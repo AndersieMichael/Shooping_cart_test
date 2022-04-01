@@ -2,6 +2,8 @@
  * This function will get all Cart data from database
  * 
  * @param {*} pg_client pool connection 
+ * @param {number} current_page current_page
+ * @param {number} limit limit
  * @returns 
  */
  async function getAllCart(pg_client,current_page,limit){
@@ -88,6 +90,8 @@ async function getCartByCustomerId(pg_client,id){
  * 
  * @param {*} pg_client pool connection 
  * @param {number} id customer_ID
+ * @param {number} current_page current_page
+ * @param {number} limit limit
  * @returns 
  */
 
@@ -212,8 +216,6 @@ async function getCartById(pg_client,id){
  * 
  * @param {*} pg_client pool connection 
  * @param {*} cust_id customer ID
- * @param {*} item_id items_ID
- * @param {*} stock total stock
  * @returns 
  */
 
@@ -289,7 +291,6 @@ async function addCart_detail(pg_client,cart_id,item_id,stock){
  * 
  * @param {*} pg_client pool connection 
  * @param {*} cart_id cart ID
- * @param {*} cust_id customer ID
  * @param {*} item_id items_ID
  * @param {*} stock total stock
  * @returns 

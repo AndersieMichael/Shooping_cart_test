@@ -2,6 +2,8 @@
  * This function will get all item data from database
  * 
  * @param {*} pg_client pool connection 
+ * @param {number} current_page current_page
+ * @param {number} limit limit
  * @returns 
  */
  async function getAllItems(pg_client,current_page,limit){

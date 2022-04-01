@@ -4,10 +4,6 @@ const router = express.Router()
 const joi = require('joi')
 const moment = require("moment")
 
-//logging
-
-const logApiBasic = require('../../utilities/slack').logApiBasic;
-
 //FUNCTION
 
 const getAllCart = require('./functions').getAllCart
@@ -24,15 +20,16 @@ const getCartByCustomerIdPagination = require('./functions').getCartByCustomerId
 
 const checkingStock = require('../Item_Catalogue/functions').checkingStock
 
-const customerById = require('../customer/functions').customerById
+//logging
 
+// const logApiBasic = require('../../utilities/slack').logApiBasic;
 
 //middleware
 
 const middleware = require('../../middleware/middleware').customerMiddlware
 
-
 //PAGINATION
+
 const PaginatePagesSimple = require('../../paginate').PaginatePagesSimple;
 
 //conection to database
@@ -42,7 +39,7 @@ const pool = require('../../utilities/connection').pool
 let head_route_name = "/shooping_cart"
 
 
-//view all cart
+//view all cart USING PAGINATION
 //===============================================================================================
 router.get('/view' , async(req , res)=>{
        
@@ -61,6 +58,9 @@ router.get('/view' , async(req , res)=>{
     const url_query = req.query;
 
     let joi_validation_query = joi_template_query.validate(url_query);
+
+    //Error validation query
+
     if(joi_validation_query.error){
         const message = {
             "message": "Failed",
@@ -69,13 +69,13 @@ router.get('/view' , async(req , res)=>{
             "error_data": joi_validation_query.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -84,7 +84,6 @@ router.get('/view' , async(req , res)=>{
     //PARAM
     let current_page = joi_validation_query.value["Page"];
     let limit = joi_validation_query.value["Limit"];
-
 
     const pg_client = await pool.connect()
 
@@ -108,13 +107,13 @@ router.get('/view' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -140,13 +139,13 @@ router.get('/view' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         //SUCCESS
 
@@ -194,13 +193,13 @@ router.get('/view/:id' , async(req , res)=>{
             "error_data": joi_validate_param.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
     }
@@ -231,13 +230,13 @@ router.get('/view/:id' , async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -260,13 +259,13 @@ router.get('/view/:id' , async(req , res)=>{
             }
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         pg_client.release();
         res.status(200).json(message);
         return; //END
@@ -312,13 +311,13 @@ router.post('/add',async(req,res)=>{
             "error_data": joi_body_validation.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -330,73 +329,13 @@ router.post('/add',async(req,res)=>{
     let itemid = joi_body_validation.value["item_id"];
     let tstock = joi_body_validation.value["total"];
 
-
     const pg_client = await pool.connect()
-
-    //checking customer exist 
-
-    let[csuccess,cresult] = await customerById(pg_client,customer_id)
-    
-    //checking customer exist  fail
-
-    if(!csuccess){
-           
-        console.error(cresult);
-        pg_client.release();
-        
-        const message = {
-            "message": "Failed",
-            "error_key": "error_internal_server",
-            "error_message": cresult,
-            "error_data": "ON checkingCUstomerExist"
-        };
-        //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
-
-        res.status(200).json(message)
-        return;
-    }
-
-    //ID tidak ditemukan
-
-    if(cresult.length === 0){ 
-        
-        //Error
-        
-        console.error(cresult);
-        const message = {
-            "message": "Failed",
-            "error_key": "error_id_not_found",
-            "error_message": "Cant found data with id :: " + customer_id.toString(),
-            "error_data": {
-                "ON": "Customer_ID_EXIST",
-                "ID": customer_id
-            }
-        };
-        //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
-        pg_client.release();
-        res.status(200).json(message);
-        return; //END
-    }
 
     //checking stock 
 
     let[ssuccess,sresult] = await checkingStock(pg_client,itemid)
     
-    //checking stock fail
+    //checkingStock fail
 
     if(!ssuccess){
            
@@ -407,16 +346,16 @@ router.post('/add',async(req,res)=>{
             "message": "Failed",
             "error_key": "error_internal_server",
             "error_message": sresult,
-            "error_data": "ON CheckingStock"
+            "error_data": "ON checkingStock"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -433,24 +372,156 @@ router.post('/add',async(req,res)=>{
             "message": "Failed",
             "error_key": "error_internal_server",
             "error_message": "request Bigger than stock",
-            "error_data": "ON stockLow"
+            "error_data": "ON StockLow"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
     }
 
-    //insert to database
+    // checking cart id
 
-    let[success,result] = await addCart(pg_client,customer_id,itemid,tstock)
+    let[csuccess,cresult] = await getCartByCustomerId(pg_client,customer_id)
+
+    //ERROR CHECKING CART ID
+
+    if(!csuccess){
+        
+        console.error(cresult);
+        pg_client.release();
+        
+        //Error Message
+        const message = {
+            "message": "Failed",
+            "error_key": "error_internal_server",
+            "error_message": cresult,
+            "error_data": "ON getCartByCustomerID"
+        };
+        
+        //LOGGING
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
+
+        res.status(200).json(message)
+        return;
+    }
+
+    //jika id tidak ditemukan di cart
+
+    if(cresult.length===0){
+        
+        //bikin cart baru
+
+        let[nsuccess,nresult] = await addCart_header(pg_client,customer_id)
+
+        // ERROR create cart baru
+
+        if(!nsuccess){
+    
+            console.error(nresult);
+            pg_client.release();
+            
+            //Error Message
+            const message = {
+                "message": "Failed",
+                "error_key": "error_internal_server",
+                "error_message": nresult,
+                "error_data": "ON addCart_header"
+            };
+            
+            //LOGGING
+            // logApiBasic( 
+            //     `Request ${head_route_name}${request_namepath} Failed`,
+            //     `REQUEST GOT AT : ${time_requested} \n` +
+            //     "REQUEST BODY/PARAM : \n" +
+            //     JSON.stringify('', null, 2),
+            //     JSON.stringify(message, null, 2)
+            // );
+    
+            res.status(200).json(message)
+            return;
+        }
+
+        cart_id = nresult[0]["cart_id"]
+
+    }
+
+    //jika cart id sudah ada
+    
+    else{
+
+        //menggunakan cart id yang sudah ada
+        
+        cart_id = cresult[0]["cart_id"]
+        
+        //checking, jika id sama maka ditambah dan end
+
+        for(var data of cresult){
+            let item_id,total;
+            item_id = data["item_id"];
+            total = data["total"];
+
+            if(item_id==itemid){
+
+                tstock = tstock + total
+
+                //update cart data
+
+                let[success,result] = await updateCart(pg_client,cart_id,itemid,tstock)
+    
+                //update Cart fail
+
+                if(!success){
+                    
+                    console.error(result);
+                    pg_client.release();
+                    
+                    const message = {
+                        "message": "Failed",
+                        "error_key": "error_internal_server",
+                        "error_message": result,
+                        "error_data": "ON updateCart"
+                    };
+                    //LOGGING
+                    // logApiBasic( 
+                    //     `Request ${head_route_name}${request_namepath} Failed`,
+                    //     `REQUEST GOT AT : ${time_requested} \n` +
+                    //     "REQUEST BODY/PARAM : \n" +
+                    //     JSON.stringify('', null, 2),
+                    //     JSON.stringify(message, null, 2)
+                    // );
+
+                    res.status(200).json(message)
+                    return;
+                }
+
+                //success
+
+                pg_client.release();
+                res.status(200).json({"message":"Success","data":result})
+                return;//END
+
+            }
+        }
+    
+    }
+
+    //add to cart id dengan orderDetail baru
+
+    let[success,result] = await addCart_detail(pg_client,cart_id,itemid,tstock)
     
     //addCart fail
 
@@ -463,16 +534,16 @@ router.post('/add',async(req,res)=>{
             "message": "Failed",
             "error_key": "error_internal_server",
             "error_message": result,
-            "error_data": "ON addCart"
+            "error_data": "ON addCart_detail"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -486,7 +557,7 @@ router.post('/add',async(req,res)=>{
 })
 
 
-// //view cart by middleware
+// //view cart by middleware USING PAGINATION
 //===============================================================================================
 router.get('/viewMiddleware' ,middleware, async(req , res)=>{
        
@@ -505,6 +576,9 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
     const url_query = req.query;
 
     let joi_validation_query = joi_template_query.validate(url_query);
+    
+    //ERROR VALIDATION QUERY
+
     if(joi_validation_query.error){
         const message = {
             "message": "Failed",
@@ -513,13 +587,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
             "error_data": joi_validation_query.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -553,13 +627,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -581,13 +655,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
             }
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         pg_client.release();
         res.status(200).json(message);
         return; //END
@@ -613,13 +687,13 @@ router.get('/viewMiddleware' ,middleware, async(req , res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         //SUCCESS
 
@@ -672,13 +746,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
             "error_data": joi_body_validation.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -713,13 +787,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
             "error_data": "ON checkingStock"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -739,13 +813,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
             "error_data": "ON StockLow"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -771,13 +845,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -806,13 +880,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
             };
             
             //LOGGING
-            logApiBasic( 
-                `Request ${head_route_name}${request_namepath} Failed`,
-                `REQUEST GOT AT : ${time_requested} \n` +
-                "REQUEST BODY/PARAM : \n" +
-                JSON.stringify('', null, 2),
-                JSON.stringify(message, null, 2)
-            );
+            // logApiBasic( 
+            //     `Request ${head_route_name}${request_namepath} Failed`,
+            //     `REQUEST GOT AT : ${time_requested} \n` +
+            //     "REQUEST BODY/PARAM : \n" +
+            //     JSON.stringify('', null, 2),
+            //     JSON.stringify(message, null, 2)
+            // );
     
             res.status(200).json(message)
             return;
@@ -859,13 +933,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
                         "error_data": "ON updateCart"
                     };
                     //LOGGING
-                    logApiBasic( 
-                        `Request ${head_route_name}${request_namepath} Failed`,
-                        `REQUEST GOT AT : ${time_requested} \n` +
-                        "REQUEST BODY/PARAM : \n" +
-                        JSON.stringify('', null, 2),
-                        JSON.stringify(message, null, 2)
-                    );
+                    // logApiBasic( 
+                    //     `Request ${head_route_name}${request_namepath} Failed`,
+                    //     `REQUEST GOT AT : ${time_requested} \n` +
+                    //     "REQUEST BODY/PARAM : \n" +
+                    //     JSON.stringify('', null, 2),
+                    //     JSON.stringify(message, null, 2)
+                    // );
 
                     res.status(200).json(message)
                     return;
@@ -901,13 +975,13 @@ router.post('/add/middleware',middleware, async(req,res)=>{
             "error_data": "ON addCart_detail"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -940,6 +1014,9 @@ router.put('/update/middleware',middleware, async(req,res)=>{
     const req_body = req.body
     
     let joi_body_validation = joi_template_body.validate(req_body);
+
+    //ERROR VALIDATION BODY
+
     if(joi_body_validation.error){
         const message = {
             "message": "Failed",
@@ -948,13 +1025,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
             "error_data": joi_body_validation.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -964,8 +1041,6 @@ router.put('/update/middleware',middleware, async(req,res)=>{
 
     let itemid = joi_body_validation.value["item_id"];
     let tstock = joi_body_validation.value["total"];
-
-    //get cust id from middleware
 
     let customer_id = res.locals.curr_customer_id;
 
@@ -991,13 +1066,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -1017,13 +1092,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
             }
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         pg_client.release();
         res.status(200).json(message);
         return; //END
@@ -1053,13 +1128,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
         };
         
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -1079,13 +1154,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
             }
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         pg_client.release();
         res.status(200).json(message);
         return; //END
@@ -1109,13 +1184,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
             "error_data": "ON addItem"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -1135,20 +1210,19 @@ router.put('/update/middleware',middleware, async(req,res)=>{
             "error_data": "ON addItem"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
     }
 
     
-
     //update to database
 
     let[success,result] = await updateCart(pg_client,id,itemid,tstock)
@@ -1167,13 +1241,13 @@ router.put('/update/middleware',middleware, async(req,res)=>{
             "error_data": "ON addItem"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;
@@ -1213,13 +1287,13 @@ router.delete('/delete/middleware',middleware,async(req,res)=>{
             "error_data": joi_body_validation.error.details
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
         res.status(200).json(message);
         return; //END
 
@@ -1252,13 +1326,13 @@ router.delete('/delete/middleware',middleware,async(req,res)=>{
             "error_data": "ON deleteItem"
         };
         //LOGGING
-        logApiBasic( 
-            `Request ${head_route_name}${request_namepath} Failed`,
-            `REQUEST GOT AT : ${time_requested} \n` +
-            "REQUEST BODY/PARAM : \n" +
-            JSON.stringify('', null, 2),
-            JSON.stringify(message, null, 2)
-        );
+        // logApiBasic( 
+        //     `Request ${head_route_name}${request_namepath} Failed`,
+        //     `REQUEST GOT AT : ${time_requested} \n` +
+        //     "REQUEST BODY/PARAM : \n" +
+        //     JSON.stringify('', null, 2),
+        //     JSON.stringify(message, null, 2)
+        // );
 
         res.status(200).json(message)
         return;

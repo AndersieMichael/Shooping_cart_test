@@ -1,10 +1,11 @@
 
 /**
+ * calculate paginate
  * 
- * @param {*} wanted_data_list 
- * @param {*} current_page 
- * @param {*} limit 
- * @param {*} total_data_count 
+ * @param {data} wanted_data_list data
+ * @param {number} current_page page
+ * @param {number} limit limit 
+ * @param {number} total_data_count total data
  * @returns 
  */
 

@@ -1,0 +1,3 @@
+hilangkan slack
+check semua function terhubung dengan route atau tidak?
+bakal ganti database karena terkexpose
